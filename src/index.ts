@@ -2,6 +2,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { connectDB } from "./config/db.js";
 
 dotenv.config();
 
@@ -17,7 +18,17 @@ app.get("/", (req, res) => {
   res.send("WedPlan Server is Running!");
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`WedPlan Server running on port ${PORT}`);
+// Health Check
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", db: "connected" });
 });
+
+async function start() {
+  await connectDB();
+
+  app.listen(PORT, () => {
+    console.log(`WedPlan Server running on port ${PORT}`);
+  });
+}
+
+start();
