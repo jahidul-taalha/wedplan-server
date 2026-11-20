@@ -13,6 +13,12 @@ const createAuth = () =>
     trustedOrigins: [process.env.CLIENT_URL].filter(
       (origin): origin is string => Boolean(origin)
     ),
+    socialProviders: {
+      google: {
+        clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      },
+    },
     user: {
       additionalFields: {
         role: {
