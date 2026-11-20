@@ -1,4 +1,5 @@
 import servicesRouter from "./routes/services.js";
+import bookingsRouter from "./routes/bookings.js";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -26,6 +27,7 @@ app.use(express.json());
 
 // Services routes
 app.use("/api/services", servicesRouter);
+app.use("/api/bookings", bookingsRouter);
 
 // Test Route
 app.get("/", (req, res) => {
