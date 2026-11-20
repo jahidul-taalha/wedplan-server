@@ -39,6 +39,30 @@ const createAuth = () =>
           required: false,
           input: false,
         },
+        requestedRole: {
+          type: "string",
+          required: false,
+          input: true,
+        },
+      },
+    },
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (user) => {
+            const { requestedRole, ...data } = user;
+
+            return {
+              data: {
+                ...data,
+                role: requestedRole === "vendor" ? "vendor" : "customer",
+                isBlocked: false,
+                subscriptionPlan: "free",
+                requestedRole: undefined,
+              },
+            };
+          },
+        },
       },
     },
   });
