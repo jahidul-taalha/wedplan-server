@@ -1,5 +1,7 @@
 import servicesRouter from "./routes/services.js";
 import bookingsRouter from "./routes/bookings.js";
+import paymentsRouter from "./routes/payments.js";
+import { stripeWebhook } from "./controllers/payments.js";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -23,11 +25,18 @@ app.use(
     credentials: true,
   })
 );
+// Stripe webhook needs the raw request body, before express.json()
+app.post(
+  "/api/payments/webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebhook
+);
 app.use(express.json());
 
 // Services routes
 app.use("/api/services", servicesRouter);
 app.use("/api/bookings", bookingsRouter);
+app.use("/api/payments", paymentsRouter);
 
 // Test Route
 app.get("/", (req, res) => {
