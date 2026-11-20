@@ -1,6 +1,7 @@
 import servicesRouter from "./routes/services.js";
 import bookingsRouter from "./routes/bookings.js";
 import paymentsRouter from "./routes/payments.js";
+import adminRouter from "./routes/admin.js";
 import { stripeWebhook } from "./controllers/payments.js";
 import express from "express";
 import cors from "cors";
@@ -37,6 +38,7 @@ app.use(express.json());
 app.use("/api/services", servicesRouter);
 app.use("/api/bookings", bookingsRouter);
 app.use("/api/payments", paymentsRouter);
+app.use("/api/admin", adminRouter);
 
 // Test Route
 app.get("/", (req, res) => {
