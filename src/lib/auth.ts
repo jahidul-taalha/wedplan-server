@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { jwt } from "better-auth/plugins";
 import { getDB } from "../config/db.js";
 
 const createAuth = () =>
@@ -71,6 +72,7 @@ const createAuth = () =>
         },
       },
     },
+    plugins: [jwt()],
   });
 
 type AuthInstance = ReturnType<typeof createAuth>;
