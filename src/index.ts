@@ -1,4 +1,4 @@
-
+import servicesRouter from "./routes/services.js";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -25,7 +25,7 @@ app.use(
 app.use(express.json());
 
 // Services routes
-app.use("/api/services", require("./routes/services.js"));
+app.use("/api/services", servicesRouter);
 
 // Test Route
 app.get("/", (req, res) => {
