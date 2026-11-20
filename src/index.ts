@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { toNodeHandler } from "better-auth/node";
 import { connectDB } from "./config/db.js";
 import { getAuth } from "./lib/auth.js";
+import { verifyJWT, verifyRole } from "./middleware/auth.js";
 
 dotenv.config();
 
@@ -36,6 +37,21 @@ app.get("/", (req, res) => {
 app.get("/health", (req, res) => {
   res.json({ status: "ok", db: "connected" });
 });
+
+// Current user
+app.get("/api/me", verifyJWT, (req, res) => {
+  res.json(req.user);
+});
+
+// Admin only
+app.get(
+  "/api/admin-test",
+  verifyJWT,
+  verifyRole("admin"),
+  (req, res) => {
+    res.json({ message: "Admin access granted", user: req.user });
+  }
+);
 
 async function start() {
   await connectDB();
