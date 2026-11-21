@@ -515,6 +515,108 @@ export async function updateService(
   }
 }
 
+export async function adminListServices(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const filter: Filter<ServiceDoc> = {};
+
+    const search = queryString(req.query.search);
+    if (search) {
+      filter.serviceName = { $regex: escapeRegex(search), $options: "i" };
+    }
+
+    const status = queryString(req.query.status);
+    if (status && status !== "all") {
+      if (!["pending", "approved", "rejected"].includes(status)) {
+        fail(res, 400, "status must be pending, approved or rejected");
+        return;
+      }
+      filter.status = status as ServiceStatus;
+    }
+
+    const category = queryString(req.query.category);
+    if (category && category !== "all") filter.category = category;
+
+    const services = await getDB()
+      .collection<ServiceDoc>("services")
+      .aggregate<ServiceWithVendor>([
+        { $match: filter },
+        { $sort: { createdAt: -1 } },
+        ...VENDOR_LOOKUP,
+      ])
+      .toArray();
+
+    res.json({ services });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminUpdateServiceStatus(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const id = queryString(req.params.id);
+    if (!isValidObjectId(id)) {
+      fail(res, 400, "Invalid service id");
+      return;
+    }
+
+    const status = (req.body as { status?: unknown })?.status;
+    if (status !== "approved" && status !== "rejected" && status !== "pending") {
+      fail(res, 400, "status must be 'approved', 'rejected' or 'pending'");
+      return;
+    }
+
+    const collection = getDB().collection<ServiceDoc>("services");
+    const _id = new ObjectId(id);
+    const service = await collection.findOne({ _id });
+    if (!service) {
+      fail(res, 404, "Service not found");
+      return;
+    }
+
+    await collection.updateOne({ _id }, { $set: { status } });
+    res.json({
+      message: "Service status updated",
+      service: await collection.findOne({ _id }),
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminDeleteService(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const id = queryString(req.params.id);
+    if (!isValidObjectId(id)) {
+      fail(res, 400, "Invalid service id");
+      return;
+    }
+
+    const result = await getDB()
+      .collection<ServiceDoc>("services")
+      .deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      fail(res, 404, "Service not found");
+      return;
+    }
+
+    res.json({ message: "Service deleted" });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function deleteService(
   req: Request,
   res: Response,
