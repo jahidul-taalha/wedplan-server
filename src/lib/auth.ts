@@ -35,6 +35,7 @@ const createAuth = () =>
         businessName: {
           type: "string",
           required: false,
+          input: true,
         },
         subscriptionPlan: {
           type: "string",
