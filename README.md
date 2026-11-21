@@ -114,11 +114,12 @@ npm run seed:admin
 
 It requires `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` to be set. It creates the account if it does not exist, promotes it to the `admin` role, and clears its blocked status.
 
-## Live Server
+## Live Website
+https://wedplan-client-omega.vercel.app
 
-`https://<your-live-server-url>`
+## Live API (Server)
+https://wedplan-server-hofg.onrender.com
 
 ## Repositories
-
 - Client: https://github.com/jahidul-taalha/wedplan-client
 - Server: https://github.com/jahidul-taalha/wedplan-server
