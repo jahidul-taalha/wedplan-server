@@ -22,9 +22,22 @@ function requireUser(req: Request, res: Response): AuthUser | null {
 async function isPremium(userId: string): Promise<boolean> {
   const vendor = await getDB()
     .collection<Document>("user")
-    .findOne({ _id: new ObjectId(userId) });
+    .findOne(
+      { _id: new ObjectId(userId) },
+      { projection: { subscriptionPlan: 1, subscriptionExpiresAt: 1 } }
+    );
 
-  return vendor?.subscriptionPlan === "premium";
+  if (vendor?.subscriptionPlan !== "premium") return false;
+
+  const expiresAt = vendor.subscriptionExpiresAt;
+  if (!expiresAt) return false;
+
+  const expiryTime =
+    expiresAt instanceof Date
+      ? expiresAt.getTime()
+      : new Date(expiresAt as string).getTime();
+
+  return Number.isFinite(expiryTime) && expiryTime > Date.now();
 }
 
 export async function createCheckoutSession(

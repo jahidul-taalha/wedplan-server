@@ -126,10 +126,23 @@ function requireVendorId(req: Request, res: Response): ObjectId | null {
 async function getVendorPlan(vendorId: ObjectId): Promise<string> {
   const vendor = await getDB()
     .collection("user")
-    .findOne({ _id: vendorId }, { projection: { subscriptionPlan: 1 } });
+    .findOne(
+      { _id: vendorId },
+      { projection: { subscriptionPlan: 1, subscriptionExpiresAt: 1 } }
+    );
 
-  return typeof vendor?.subscriptionPlan === "string"
-    ? vendor.subscriptionPlan
+  if (vendor?.subscriptionPlan !== PREMIUM_PLAN) return "free";
+
+  const expiresAt = vendor.subscriptionExpiresAt;
+  if (!expiresAt) return "free";
+
+  const expiryTime =
+    expiresAt instanceof Date
+      ? expiresAt.getTime()
+      : new Date(expiresAt as string).getTime();
+
+  return Number.isFinite(expiryTime) && expiryTime > Date.now()
+    ? PREMIUM_PLAN
     : "free";
 }
 
