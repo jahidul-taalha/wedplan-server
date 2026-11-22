@@ -33,6 +33,7 @@ const createAuth = () =>
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID ?? "",
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        redirectURI: `${process.env.CLIENT_URL}/api/auth/callback/google`,
       },
     },
     user: {
