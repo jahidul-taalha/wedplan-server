@@ -3,8 +3,23 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { jwt } from "better-auth/plugins";
 import { getDB } from "../config/db.js";
 
+const productionCookieConfig =
+  process.env.NODE_ENV === "production"
+    ? ({
+        advanced: {
+          defaultCookieAttributes: {
+            sameSite: "none",
+            secure: true,
+            httpOnly: true,
+          },
+          useSecureCookies: true,
+        },
+      } as const)
+    : {};
+
 const createAuth = () =>
   betterAuth({
+    ...productionCookieConfig,
     database: mongodbAdapter(getDB()),
     emailAndPassword: {
       enabled: true,
